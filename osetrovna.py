@@ -27,6 +27,9 @@ diseases_dir_path = './DISEASES/'
 DISEASES = {}
 
 file_list = [f for f in os.listdir(diseases_dir_path) if os.path.isfile(os.path.join(diseases_dir_path, f))]
+
+DISEASES_AMOUNT = len(file_list)
+
 for file in file_list:
 
     DISEASES[file[:-4]] = {}
@@ -44,34 +47,64 @@ for file in file_list:
 
 # Generate results
 
-ILLNESS = "Cukrovka"
+def generate_disease(id):
 
-headers = ["ENZYM", "HODNOTA"]
-data = []
+    disease_id = int(id) % DISEASES_AMOUNT
+    ILLNESS = list(DISEASES.items())[disease_id][0]
+    # DEBUG:
+    #pprint(ILLNESS)
 
-for enzym in DISEASES[ILLNESS]:
+    headers = ["ENZYM", "HODNOTA"]
+    data = []
 
-    symbol = DISEASES[ILLNESS][enzym]
-    if symbol == "-":
-        lower_limit = 0
-        upper_limit = REFERENCE_VALUES[enzym][1]
-    elif symbol == "+":
-        lower_limit = REFERENCE_VALUES[enzym][2]
-        upper_limit = float(REFERENCE_VALUES[enzym][2]) + 500
-    else:
-        lower_limit = REFERENCE_VALUES[enzym][1]
-        upper_limit = REFERENCE_VALUES[enzym][2]
+    for enzym in DISEASES[ILLNESS]:
 
-    import random
-    random_float = random.uniform(float(lower_limit), float(upper_limit))
-    random_float_rounded = round(random_float, 2)
+        symbol = DISEASES[ILLNESS][enzym]
+        if symbol == "-":
+            lower_limit = 0
+            upper_limit = REFERENCE_VALUES[enzym][1]
+        elif symbol == "+":
+            lower_limit = REFERENCE_VALUES[enzym][2]
+            upper_limit = float(REFERENCE_VALUES[enzym][2]) + 500
+        else:
+            lower_limit = REFERENCE_VALUES[enzym][1]
+            upper_limit = REFERENCE_VALUES[enzym][2]
 
-    data.append([enzym, f"{random_float_rounded} {REFERENCE_VALUES[enzym][0]}"])
+        import random
+        random_float = random.uniform(float(lower_limit), float(upper_limit))
+        random_float_rounded = round(random_float, 2)
+
+        data.append([enzym, f"{random_float_rounded} {REFERENCE_VALUES[enzym][0]}"])
+
+    # =================================
+
+    table = tabulate(data, headers, tablefmt="pretty",  colalign=("left", "left"))
+
+    # =================================
+
+    # Get the terminal size
+    import shutil
+    terminal_size = shutil.get_terminal_size()
+    terminal_width = terminal_size.columns
+
+    # Calculate the left padding to center the table
+    left_padding = (terminal_width - len(table.splitlines()[0])) // 2
+    # Center each line of the table individually
+    centered_table = "\n".join(line.center(terminal_width) for line in table.splitlines())
+
+    # Print the centered table
+    print(centered_table)
 
 # =================================
 
-table = tabulate(data, headers, tablefmt="pretty",  colalign=("left", "left"))
-print(table)
 
+while True:
+    user_input = input("VLOŽTE ID VZORKU: ")
 
-
+    # Check if the input is a positive integer
+    if user_input.isdigit() and int(user_input) > 0:
+        os.system('clear')
+        print("Výsledky pro vzorek:", user_input)
+        generate_disease(user_input)
+    else:
+        print("ERROR: Zadejte kladné celé číslo")
