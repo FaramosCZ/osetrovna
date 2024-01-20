@@ -27,6 +27,8 @@ diseases_dir_path = './DISEASES/'
 DISEASES = {}
 
 file_list = [f for f in os.listdir(diseases_dir_path) if os.path.isfile(os.path.join(diseases_dir_path, f))]
+file_list = sorted(file_list)
+#pprint(file_list)
 
 DISEASES_AMOUNT = len(file_list)
 
