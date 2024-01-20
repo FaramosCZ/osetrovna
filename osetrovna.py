@@ -49,36 +49,45 @@ for file in file_list:
 
 def generate_disease(id):
 
-    disease_id = int(id) % DISEASES_AMOUNT
-    ILLNESS = list(DISEASES.items())[disease_id][0]
-    # DEBUG:
-    #pprint(ILLNESS)
+    saved_file_path = os.path.join("./SAVED_RESULTS/", f"{id}.result")
+    if os.path.exists(saved_file_path):
+        with open(saved_file_path, 'r') as file:
+                table = file.read()
 
-    headers = ["ENZYM", "HODNOTA"]
-    data = []
+    else:
+        disease_id = int(id) % DISEASES_AMOUNT
+        ILLNESS = list(DISEASES.items())[disease_id][0]
+        # DEBUG:
+        #pprint(ILLNESS)
 
-    for enzym in DISEASES[ILLNESS]:
+        headers = ["ENZYM", "HODNOTA"]
+        data = []
 
-        symbol = DISEASES[ILLNESS][enzym]
-        if symbol == "-":
-            lower_limit = 0
-            upper_limit = REFERENCE_VALUES[enzym][1]
-        elif symbol == "+":
-            lower_limit = REFERENCE_VALUES[enzym][2]
-            upper_limit = float(REFERENCE_VALUES[enzym][2]) + 500
-        else:
-            lower_limit = REFERENCE_VALUES[enzym][1]
-            upper_limit = REFERENCE_VALUES[enzym][2]
+        for enzym in DISEASES[ILLNESS]:
 
-        import random
-        random_float = random.uniform(float(lower_limit), float(upper_limit))
-        random_float_rounded = round(random_float, 2)
+            symbol = DISEASES[ILLNESS][enzym]
+            if symbol == "-":
+                lower_limit = 0
+                upper_limit = REFERENCE_VALUES[enzym][1]
+            elif symbol == "+":
+                lower_limit = REFERENCE_VALUES[enzym][2]
+                upper_limit = float(REFERENCE_VALUES[enzym][2]) + 500
+            else:
+                lower_limit = REFERENCE_VALUES[enzym][1]
+                upper_limit = REFERENCE_VALUES[enzym][2]
 
-        data.append([enzym, f"{random_float_rounded} {REFERENCE_VALUES[enzym][0]}"])
+            import random
+            random_float = random.uniform(float(lower_limit), float(upper_limit))
+            random_float_rounded = round(random_float, 2)
 
-    # =================================
+            data.append([enzym, f"{random_float_rounded} {REFERENCE_VALUES[enzym][0]}"])
 
-    table = tabulate(data, headers, tablefmt="pretty",  colalign=("left", "left"))
+        # =================================
+
+        table = tabulate(data, headers, tablefmt="pretty",  colalign=("left", "left"))
+
+        with open(saved_file_path, 'w') as result_file:
+            result_file.write(table)
 
     # =================================
 
